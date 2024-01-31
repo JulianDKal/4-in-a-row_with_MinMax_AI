@@ -103,7 +103,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 				return;
 			}
 
-#pragma endregion
+			#pragma endregion
 		}
 		else 
 		{
@@ -172,6 +172,48 @@ int minMax(treeNode* root)
 
 int evaluateGrid(char grid[6][7])
 {
+	//vertical
+	for (int row = 0; row < 3; row++)
+	{
+		for (int column = 0; column < 7; column++)
+		{
+			//loop through the next 4 cells
+			for (int i = 0; i < 4; i++)
+			{
+
+			}
+
+		}
+	}
+
+	//horizontal
+	for (int row = 0; row < 6; row++)
+	{
+		for (int column = 0; column < 4; column++)
+		{
+			
+		}
+	}
+
+	//diagonally downwards
+	for (int row = 0; row < 3; row++)
+	{
+		for (int column = 0; column < 4; column++)
+		{
+			
+		}
+	}
+
+	//diagonally upwards
+	for (int row = 3; row < 6; row++)
+	{
+		for (int column = 0; column < 4; column++)
+		{
+			
+		}
+	}
+
+	
 	return 1;
 }
 
@@ -189,15 +231,15 @@ int placeMockInput(char grid[6][7], int column, char currentPlayer)
 	return 0; //failure, can't place sign
 }
 
-//creates a tree with a total of 399 nodes
+//creates a tree with a total of 399 nodes, only called once
 int initiateTree(treeNode* root)
 {
 	for (int i = 0; i < 7; i++)
 	{
 		treeNode* newNode = (treeNode*)malloc(sizeof(treeNode));
 		if (newNode == NULL) {
-			printf("Fehler beim Erstellen des Baums");
-			return 0; //Fehler
+			printf("error creating the tree for the ai");
+			return 0; //error
 		}
 		newNode->value = 0;
 		root->children[i] = newNode;
@@ -205,7 +247,7 @@ int initiateTree(treeNode* root)
 		{
 			treeNode* newNewNode = (treeNode*)malloc(sizeof(treeNode));
 			if (newNewNode == NULL) {
-				printf("Fehler beim Erstellen des Baums");
+				printf("error creating the tree for the ai");
 				return 0;
 			}
 			newNewNode->value = 0;
@@ -215,7 +257,7 @@ int initiateTree(treeNode* root)
 			{
 				treeNode* newNewNewNode = (treeNode*)malloc(sizeof(treeNode));
 				if (newNewNewNode == NULL) {
-					printf("Fehler beim Erstellen des Baums");
+					printf("error creating the tree for the ai");
 					return 0;
 				}
 				newNewNewNode->value = 0;
@@ -225,4 +267,34 @@ int initiateTree(treeNode* root)
 	}
 
 	return 1; //success
+}
+
+
+//improve this so that it returns a random node if several options are equal
+int maxNode(treeNode* parent)
+{
+	int maxNode = 0;
+	int maxValue = -10000;
+	for (int i = 0; i < 7; i++)
+	{
+		if (parent->children[i]->value > maxValue) {
+			maxValue = parent->children[i]->value;
+			maxNode = i;
+		}
+	}
+	return maxNode;
+}
+
+int minNode(treeNode* parent)
+{
+	int minNode = 0;
+	int minValue = 10000;
+	for (int i = 0; i < 7; i++)
+	{
+		if (parent->children[i]->value < minValue) {
+			minValue = parent->children[i]->value;
+			minNode = i;
+		}
+	}
+	return minNode;
 }

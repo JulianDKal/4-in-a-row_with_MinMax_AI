@@ -27,7 +27,7 @@ int saveGameState(char grid[6][7], char gameType, char currentPlayer)
 			//create substrings for the start and end of the string
 			char* subEnd = substring(dateiName, strlen(dateiName) - 4, 4);
 			char* subStart = substring(dateiName, 0, strlen(dateiName) - 4);
-			//printf("%s\n", subEnd);
+
 			if (subEnd != NULL && strcmp(subEnd, ".txt") == 0 && subStart != NULL && checkForAlNum(subStart)) {
 				break;
 			}
@@ -224,7 +224,7 @@ int gameIsOver(char grid[6][7])
 			}
 		}
 	}
-	//schräg nach unten
+	//diagonally downwards
 	for (int row = 0; row < 3; row++)
 	{
 		for (int column = 0; column < 4; column++)
@@ -238,7 +238,7 @@ int gameIsOver(char grid[6][7])
 			}
 		}
 	}
-	//schräg nach oben
+	//diagonally upwards
 	for (int row = 3; row < 6; row++)
 	{
 		for (int column = 0; column < 4; column++)
