@@ -35,9 +35,10 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		if (currentPlayer != cP) currentPlayer = changePlayer(currentPlayer);
 	}
 
-	//populate the tree
+	//initiate the tree, creating the tree structure in the first place
 	treeNode* rootNode = (treeNode*)malloc(sizeof(treeNode));
 	if (!initiateTree(rootNode)) {
+		printf("Something went wrong with creating the AI tree! Please try to restart the game");
 		return;
 	};
 
@@ -106,7 +107,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		}
 		else 
 		{
-			makeComputerMove(grid, backup);
+			makeComputerMove(grid, backup, rootNode);
 			currentPlayer = changePlayer(currentPlayer);
 		}
 	}
@@ -119,7 +120,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	}
 }
 
-void makeComputerMove(char grid[6][7], char gridCopy[6][7])
+void makeComputerMove(char grid[6][7], char gridCopy[6][7], treeNode* root)
 {
 	Sleep(500);
 	char currentPlayer = 'O';
@@ -131,27 +132,32 @@ void makeComputerMove(char grid[6][7], char gridCopy[6][7])
 			break;
 		}
 	}
-	//populate Tree
+	populateTree(root, gridCopy);
 	//evaluate Best Play
 	//placeInput
 }
 
 
-void populateTree(treeNode* root, char currentMove[6][7])
+void populateTree(treeNode* root, char currentState[6][7])
 {
 	char fakeGrid[6][7];
-	copyGrid(currentMove, fakeGrid);
+	copyGrid(currentState, fakeGrid);
+	int count = 0;
 
 	for (int i = 0; i < 7; i++)
 	{
-		
+		copyGrid(currentState, fakeGrid); //set the fake grid to its original form
+		placeMockInput(fakeGrid, i, 'O');
+
 		for (int j = 0; j < 7; j++)
 		{
-
+			placeMockInput(fakeGrid, i, 'X');
 			for (int k = 0; k < 7; k++)
 			{
-				root->children[i]->children[j]->children[k]->value = evaluateGrid(currentMove);
-				printf("%d ", root->children[i]->children[j]->children[k]->value);
+				placeMockInput(fakeGrid, i, 'O');
+				count++;
+				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid);
+				printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
 			}
 		}
 	}
@@ -166,25 +172,24 @@ int minMax(treeNode* root)
 
 int evaluateGrid(char grid[6][7])
 {
-
+	return 1;
 }
 
+//if possible, places an input on the copy of the current grid
 int placeMockInput(char grid[6][7], int column, char currentPlayer)
 {
 	for (int i = 5; i >= 0; i--)
 	{
-		if (grid[i][column - 1] != ' ') continue;
+		if (grid[i][column] != ' ') continue;
 		else {
-			grid[i][column - 1] = currentPlayer;
+			grid[i][column] = currentPlayer;
 			return 1; //success
 		}
 	}
 	return 0; //failure, can't place sign
 }
 
-//erstellt einen Baum mit insgesamt 399 Nodes
-//Diesen Baum soll die AI bei jedem ihrer Züge ausgehend von dem jetzigen Spielstand mit neuen Werten versehen
-//und dann mithilfe von MinMax durch den Baum traversieren und den besten Zug berechnen
+//creates a tree with a total of 399 nodes
 int initiateTree(treeNode* root)
 {
 	for (int i = 0; i < 7; i++)

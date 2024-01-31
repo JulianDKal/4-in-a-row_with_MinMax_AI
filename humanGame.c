@@ -5,12 +5,6 @@
 #include <stdlib.h>
 #include <windows.h>
 
-//Summary:
-//Diese Datei enthält alle Funktionen und Variablen, die spezifisch und wichtig 
-//für das Spiel mit zwei Menschen sind. Ich hatte auch schon damit begonnen, ein Spiel gegen den Computer
-//zu implementieren, bin jedoch nicht damit fertig geworden. Die zwischen humanGame und computerGame
-//geteilten Funktionen liegen in resources.c
-
 void printMessage(char player) {
 	printf("Player %c, input a number from 1 to 7 to set, -1 to undo or -2 to save>> ", player);
 }

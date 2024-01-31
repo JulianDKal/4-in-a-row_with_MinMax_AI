@@ -5,7 +5,7 @@
 #include <io.h>
 #include "humanGame.h"
 #include <ctype.h>
-//#include "computerGame.h"
+#include "computerGame.h"
 #include <string.h>
 
 void copyGrid(char src[6][7], char destination[6][7])

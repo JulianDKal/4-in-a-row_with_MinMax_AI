@@ -9,6 +9,7 @@ struct treenode
 void startComputerGame(char loadGrid[6][7], int loaded, char cP);
 void populateTree(treeNode* root, char grid[6][7]);
 int minMax(treeNode* root);
-void makeComputerMove(char grid[6][7]);
+void makeComputerMove(char grid[6][7], char gridCopy[6][7], treeNode* root);
 int initiateTree(treeNode* root);
 int evaluateGrid(char grid[6][7]);
+int placeMockInput(char grid[6][7], int column, char currentPlayer);
