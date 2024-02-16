@@ -4,6 +4,40 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define MAX_DEPTH 3
+char emptyBoard[6][7] = {
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '}
+};
+char exampleBoard1[6][7] = {
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', 'X', 'X', ' ', ' ', ' '},
+	{' ', 'X', 'X', 'O', 'O', 'O', ' '}
+};
+char exampleBoard2[6][7] = {
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', 'O', ' ', ' '},
+	{' ', ' ', ' ', 'X', 'O', ' ', ' '},
+	{' ', 'O', 'O', 'X', 'X', ' ', ' '},
+	{' ', 'X', 'X', 'O', 'O', 'O', 'X'}
+};
+char exampleBoard3[6][7] = {
+	{'O', ' ', ' ', ' ', ' ', ' ', ' '},
+	{'X', ' ', ' ', ' ', ' ', ' ', ' '},
+	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
+	{'X', 'O', ' ', ' ', ' ', ' ', ' '},
+	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
+	{'X', 'O', 'X', 'O', 'X', ' ', ' '}
+};
+
 
 void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 {
@@ -37,6 +71,11 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 
 	//initiate the tree, creating the tree structure in the first place
 	treeNode* rootNode = (treeNode*)malloc(sizeof(treeNode));
+	if (rootNode == NULL) {
+		printf("error creating the root node");
+		return;
+	}
+	rootNode->depth = 0;
 	if (!initiateTree(rootNode)) {
 		printf("Something went wrong with creating the AI tree! Please try to restart the game");
 		return;
@@ -137,7 +176,6 @@ void makeComputerMove(char grid[6][7], char gridCopy[6][7], treeNode* root)
 	//placeInput
 }
 
-
 void populateTree(treeNode* root, char currentState[6][7])
 {
 	char fakeGrid[6][7];
@@ -163,10 +201,21 @@ void populateTree(treeNode* root, char currentState[6][7])
 	}
 }
 
-
 //apply minmax algorithm to the populated tree
 int minMax(treeNode* root)
 {
+	if (root->depth < (MAX_DEPTH - 1)) {
+		for (int i = 0; i < 7; i++)
+		{
+			return minMax(root->children[i]);
+		}
+	}
+	else {
+		if (root->depth % 2 == 0) { //computer move, maximizing
+			return maxNode(root);
+		}
+		else return minNode(root); //human move, minimizing
+	}
 
 }
 
@@ -242,6 +291,7 @@ int initiateTree(treeNode* root)
 			return 0; //error
 		}
 		newNode->value = 0;
+		newNode->depth = 1;
 		root->children[i] = newNode;
 		for (int j = 0; j < 7; j++)
 		{
@@ -251,6 +301,7 @@ int initiateTree(treeNode* root)
 				return 0;
 			}
 			newNewNode->value = 0;
+			newNewNode->depth = 2;
 			newNode->children[j] = newNewNode;
 
 			for (int k = 0; k < 7; k++)
@@ -261,6 +312,7 @@ int initiateTree(treeNode* root)
 					return 0;
 				}
 				newNewNewNode->value = 0;
+				newNewNewNode->depth = 3;
 				newNewNode->children[k] = newNewNewNode;
 			}
 		}
@@ -268,7 +320,6 @@ int initiateTree(treeNode* root)
 
 	return 1; //success
 }
-
 
 //improve this so that it returns a random node if several options are equal
 int maxNode(treeNode* parent)
