@@ -156,7 +156,7 @@ void populateTree(treeNode* root, char currentState[6][7])
 			{
 				placeMockInput(fakeGrid, i, 'O');
 				count++;
-				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid);
+				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid, i);
 				printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
 			}
 		}
@@ -170,51 +170,77 @@ int minMax(treeNode* root)
 
 }
 
-int evaluateGrid(char grid[6][7])
+int evaluateGrid(char grid[6][7], int columnToPlace)
 {
-	//vertical
-	for (int row = 0; row < 3; row++)
+	//determine the row in which the new piece is placed
+	int rowToPlace = -1;
+	for (int i = 5; i >= 0; i--)
 	{
-		for (int column = 0; column < 7; column++)
-		{
-			//loop through the next 4 cells
-			for (int i = 0; i < 4; i++)
-			{
-
-			}
-
-		}
+		if (grid[i][columnToPlace] == ' ') rowToPlace = i;
 	}
 
-	//horizontal
-	for (int row = 0; row < 6; row++)
-	{
-		for (int column = 0; column < 4; column++)
-		{
-			
-		}
+	if (rowToPlace == -1) {
+		printf("grid couldn't be evaluated");
+		return -1000;
 	}
-
-	//diagonally downwards
-	for (int row = 0; row < 3; row++)
-	{
-		for (int column = 0; column < 4; column++)
-		{
-			
-		}
-	}
-
-	//diagonally upwards
-	for (int row = 3; row < 6; row++)
-	{
-		for (int column = 0; column < 4; column++)
-		{
-			
-		}
-	}
-
 	
+	//starting from the current piece, analyze in all directions the consequences of the move
+	int xCount = 0;
+	int oCount = 0;
+	int emptyCount = 0;
+	int result = 0;
+
+	//vertical
+	for (int i = 0; i < 4; i++)
+	{
+		if (rowToPlace + i <= 5)
+		{
+			if (grid[rowToPlace + i][columnToPlace] == 'X') xCount++;
+			else if (grid[rowToPlace + i][columnToPlace] == 'O') oCount++;
+		}
+	}
+	emptyCount = 4 - (xCount + oCount);
+	result += evaluationOfFour(xCount, oCount, emptyCount);
+	
+	//horizontal right
+	for (int i = 0; i < 4; i++)
+	{
+		if (columnToPlace + i <= 6)
+		{
+			if (grid[rowToPlace][columnToPlace + i] == 'X') xCount++;
+			else if (grid[rowToPlace][columnToPlace + i] == 'O') oCount++;
+		}
+	}
+	//horizontal left
+	for (int i = 0; i < 4; i++)
+	{
+		if (columnToPlace + i >= 0)
+		{
+			if (grid[rowToPlace][columnToPlace - i] == 'X') xCount++;
+			else if (grid[rowToPlace][columnToPlace - i] == 'O') oCount++;
+		}
+	}
+
+	//diagonally left
+
+	//diagonally right
+
 	return 1;
+}
+
+int evaluationOfFour(int xCount, int oCount, int emptyCount)
+{
+	int result = 0;
+	if (oCount == 4) {
+		result = 500;
+		return result;
+	}
+	else if (oCount == 3 && emptyCount == 1) result += 5;
+	else if (oCount == 2 && emptyCount == 2) result += 3;
+	else if (oCount == 2 && emptyCount <= 1) result += 1;
+	else if (oCount == 1 && xCount >= 2) result += 5;
+
+	return result;
 }
 
 //if possible, places an input on the copy of the current grid
