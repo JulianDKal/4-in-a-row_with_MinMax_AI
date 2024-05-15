@@ -46,9 +46,8 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	int rounds = 0;
 	int* roundsPtr = &rounds;
 
-	char currentPlayer = 'O';
+	char currentPlayer = 'X';
 	char grid[6][7] = { 0 };
-	char backup[6][7] = { 0 };
 
 	for (int i = 0; i < 7; i++)
 	{
@@ -75,18 +74,11 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		{
 			if (grid[i][j] == 0) {
 				grid[i][j] = ' ';
-				backup[i][j] = ' ';
 			}
 		}
 	}
 	char gridCopy[6][7];
 	copyGrid(grid, gridCopy);
-	//load grid from save state, if this is not a new game
-	if (loaded)
-	{
-		copyGrid(loadGrid, grid);
-		if (currentPlayer != cP) currentPlayer = changePlayer(currentPlayer);
-	}
 
 	//initiate the tree, creating the tree structure in the first place
 	treeNode* rootNode = (treeNode*)malloc(sizeof(treeNode));
@@ -111,40 +103,15 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		#pragma region Human Move Code
 			while (1)
 			{
-				if (scanf_s("%d", &inputNumber) == 1 && ((inputNumber >= 1 && inputNumber <= 7) || inputNumber == -1 || inputNumber == -2)) break;
+				if (scanf_s("%d", &inputNumber) == 1 && (inputNumber >= 1 && inputNumber <= 7)) break;
 				while (fgetc(stdin) != '\n')
 					;
 
 				printBoard(grid);
 				printf("Can't take this input. Please try again >> ");
 			}
-			//undo option
-			if (inputNumber == -1) {
-				if (Undo(roundsPtr, backuppedPtr, grid, backup) == 1) //Undo fehlgeschlagen
-				{
-					currentPlayer = changePlayer(currentPlayer);
-					continue;
-				}
 
-				else {
-					rounds--;
-					Sleep(1000);
-					continue;
-				}
-			}
-			//save option
-			if (inputNumber == -2) {
-				if (saveGameState(grid, 'h', currentPlayer) == 0) {
-					rounds--;
-					continue;
-				}
-				else {
-					printf("Fehler beim Speichern des Spiels!");
-					return;
-				}
-			}
-
-			if (placeInput(currentPlayer, grid, backup, inputNumber) == 1) { //successful
+			if (placeInput(currentPlayer, grid, inputNumber) == 1) { //successful
 				currentPlayer = changePlayer(currentPlayer);
 				backupped = 0; //reset the backup checker
 			}
@@ -155,7 +122,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 				Sleep(1000);
 			}
 
-			//Das Spielfeld ist voll
+			//The board is full
 			if (rounds == 42) {
 				printf("\nDraw! Congratulations to you both :) ");
 				return;
@@ -165,7 +132,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		}
 		else 
 		{
-			makeComputerMove(grid, backup, rootNode);
+			makeComputerMove(grid, rootNode);
 			currentPlayer = changePlayer(currentPlayer);
 		}
 	}
@@ -179,7 +146,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	}
 }
 
-void makeComputerMove(char grid[6][7], char gridCopy[6][7], treeNode* root)
+void makeComputerMove(char grid[6][7], treeNode* root)
 {
 	Sleep(500);
 	char currentPlayer = 'O';
@@ -187,11 +154,11 @@ void makeComputerMove(char grid[6][7], char gridCopy[6][7], treeNode* root)
 	while (1)
 	{
 		int randomNumber = rand() % 7 + 1;
-		if (placeInput(currentPlayer, grid, gridCopy, randomNumber) != 0){
+		if (placeInput(currentPlayer, grid, randomNumber) != 0){
 			break;
 		}
 	}
-	populateTree(root, gridCopy);
+	populateTree(root, grid);
 	//evaluate Best Play
 	//placeInput
 }
@@ -212,7 +179,7 @@ void populateTree(treeNode* root, char currentState[6][7])
 			{
 				count++;
 				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid, i, 'x');
-				printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
+				//printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
 			}
 		}
 	}
@@ -252,7 +219,7 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 			break;
 		}
 	}
-	printf("row: %d  value: ", rowToPlace);
+	//printf("row: %d  value: ", rowToPlace);
 
 	if (rowToPlace == -1) {
 		printf("grid couldn't be evaluated");
@@ -390,18 +357,18 @@ int evaluationOfFour(int xCount, int oCount, int emptyCount)
 }
 
 //if possible, places an input on the copy of the current grid
-int placeMockInput(char grid[6][7], int column, char currentPlayer)
-{
-	for (int i = 5; i >= 0; i--)
-	{
-		if (grid[i][column] != ' ') continue;
-		else {
-			grid[i][column] = currentPlayer;
-			return 1; //success
-		}
-	}
-	return 0; //failure, can't place sign
-}
+//int placeMockInput(char grid[6][7], int column, char currentPlayer)
+//{
+//	for (int i = 5; i >= 0; i--)
+//	{
+//		if (grid[i][column] != ' ') continue;
+//		else {
+//			grid[i][column] = currentPlayer;
+//			return 1; //success
+//		}
+//	}
+//	return 0; //failure, can't place sign
+//}
 
 //creates a tree with a total of 399 nodes, only called once
 int initiateTree(treeNode* root)

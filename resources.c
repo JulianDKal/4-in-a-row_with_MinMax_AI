@@ -14,142 +14,6 @@ void copyGrid(char src[6][7], char destination[6][7])
 	memcpy(destination, src, size);
 }
 
-int saveGameState(char grid[6][7], char gameType, char currentPlayer)
-{
-	FILE* fp;
-	char dateiName[70];
-	printf("\nPlease input a name for the save file>> ");
-
-	while (1)
-	{
-		if (scanf("%s", dateiName) == 1 && strlen(dateiName) >= 5 ) 
-		{
-			//create substrings for the start and end of the string
-			char* subEnd = substring(dateiName, strlen(dateiName) - 4, 4);
-			char* subStart = substring(dateiName, 0, strlen(dateiName) - 4);
-
-			if (subEnd != NULL && strcmp(subEnd, ".txt") == 0 && subStart != NULL && checkForAlNum(subStart)) {
-				break;
-			}
-
-		}
-
-		while (fgetc(stdin) != '\n')
-			;
-			
-		printf("\nInvalid. The input must look like this: xxxx.txt (xxxx can have an arbitrary length)");
-		printf("\nPlease input a name for the save file>> ");
-	}
-
-	if ((fp = fopen(dateiName, "w+t")) == NULL) {
-		return 1;
-	}
-
-	for (int i = 0; i < 6; i++)
-	{
-		for (int j = 0; j < 7; j++)
-		{
-			fputc(grid[i][j], fp);
-		}
-		fputs("\n", fp);
-	}
-	fputc(gameType, fp);
-	fputc(currentPlayer, fp);
-	fclose(fp);
-	return 0; //success
-}
-
-char* substring(const char* str, int start, int length)
-{
-	if (str == NULL || (start + length) > strlen(str)) return NULL;
-	char* sub = (char*)malloc(length + 1);
-
-	//str ab dem in start spezifizierten Eintrag in sub kopieren
-	if(sub != NULL ) strncpy(sub, str + start, length);
-	else {
-		printf("Fehler beim Kopieren des substrings");
-		return NULL;
-	}
-	sub[length] = '\0';
-
-	return sub;
-}
-
-int checkForAlNum(const char* str)
-{
-	for (int i = 0; i < strlen(str); i++)
-	{
-		if (!isalnum(str[i])) return 0; //Fehler
-	}
-
-	//Erfolg, alle Charaktere im string sind alphanumerisch
-	return 1;
-}
-
-int loadGameState()
-{
-	FILE* fp;
-	char dateiName[50];
-	printf("\nPlease input the name of the save file>> ");
-
-	while (1)
-	{
-		if (scanf("%s", dateiName) == 1) {
-			//Erfolg wenn die Datei im Verzeichnis existiert
-			if (_access(dateiName, 0) == 0) break;
-		}
-
-		while (fgetc(stdin) != '\n')
-			;
-
-		printf("This save file doesn't exist. Please try again>> ");
-	}
-
-	if ((fp = fopen(dateiName, "r+")) == NULL) {
-		printf("fopen error");
-		return 1;
-	}
-	char loadedGrid[6][7] = { 0 };
-	char c;
-	if (fp == NULL) printf("Fopen error!!");
-
-	for (int i = 0; i < 6; i++)
-	{
-		for (int j = 0; j < 8; j++) //j < 8, da am Ende der Zeile immer der newline character eingelesen wird
-		{
-			c = fgetc(fp);
-			if (c == '\n') continue;
-			else loadedGrid[i][j] = c;
-		}
-	}
-	//read in the save file character by character and save it in grid
-	char gT = fgetc(fp);
-	char cP = fgetc(fp);
-
-	if (!isalpha(gT) || !isalpha(cP))
-	{
-		printf("Fehler beim Laden der Datei");
-		return 1; //Fehler
-	}
-
-	fclose(fp);
-
-	if (gT == 'h') startHumanGame(loadedGrid, 1, cP);
-	else if (gT == 'c') startComputerGame(loadedGrid, 1, cP);
-
-	return 0; //success
-}
-
-void printHorizontalLine()
-{
-	printf("+");
-	for (int h = 0; h < 41; h++)
-	{
-		printf("-");
-	}
-	printf("+\n");
-}
-
 void printBoard(char grid[6][7])
 {
 	system("cls");
@@ -171,21 +35,12 @@ void printBoard(char grid[6][7])
 	printHorizontalLine();
 }
 
-void printBreakLine() {
-	for (int i = 0; i < 50; i++)
-	{
-		printf("-");
-	}
-	printf("\n");
-}
-
-int placeInput(char currentPlayer, char grid[6][7], char copy[6][7], int column)
+int placeInput(char currentPlayer, char grid[6][7], int column)
 {
 	for (int i = 5; i >= 0; i--)
 	{
 		if (grid[i][column - 1] != ' ') continue;
 		else {
-			copyGrid(grid, copy);
 			grid[i][column - 1] = currentPlayer;
 			return 1; //success
 		}
@@ -260,4 +115,18 @@ int gameIsOver(char grid[6][7])
 char changePlayer(char cP) {
 	if (cP == 'X') return 'O';
 	else return 'X';
+}
+
+void printMessage(char player) {
+	printf("Player %c, input a number from 1 to 7 to set, -1 to undo or -2 to save>> ", player);
+}
+
+void printHorizontalLine()
+{
+	printf("+");
+	for (int h = 0; h < 41; h++)
+	{
+		printf("-");
+	}
+	printf("+\n");
 }

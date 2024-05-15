@@ -18,9 +18,6 @@
     <ClCompile Include="Program.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="humanGame.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="resources.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="humanGame.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="computerGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
