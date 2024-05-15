@@ -30,8 +30,8 @@ char exampleBoard2[6][7] = {
 	{' ', 'X', 'X', 'O', 'O', 'O', 'X'}
 };
 char exampleBoard3[6][7] = {
-	{'O', ' ', ' ', ' ', ' ', ' ', ' '},
-	{'X', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
 	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
 	{'X', 'O', ' ', ' ', ' ', ' ', ' '},
 	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
@@ -46,9 +46,28 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	int rounds = 0;
 	int* roundsPtr = &rounds;
 
-	char currentPlayer = 'X';
+	char currentPlayer = 'O';
 	char grid[6][7] = { 0 };
 	char backup[6][7] = { 0 };
+
+	for (int i = 0; i < 7; i++)
+	{
+		printf("%d ", evaluateGrid(exampleBoard1, i, 'O'));
+		printf("\n");
+	}
+	printf("\n");
+	for (int i = 0; i < 7; i++)
+	{
+		printf("%d ", evaluateGrid(exampleBoard2, i, 'O'));
+		printf("\n");
+	}
+	printf("\n");
+	for (int i = 0; i < 7; i++)
+	{
+		printf("%d ", evaluateGrid(exampleBoard3, i, 'O'));
+		printf("\n");
+	}
+
 	//fill up the grids
 	for (int i = 0; i < 6; i++)
 	{
@@ -62,7 +81,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	}
 	char gridCopy[6][7];
 	copyGrid(grid, gridCopy);
-
+	//load grid from save state, if this is not a new game
 	if (loaded)
 	{
 		copyGrid(loadGrid, grid);
@@ -142,7 +161,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 				return;
 			}
 
-			#pragma endregion
+			#pragma endregion Human Move Code
 		}
 		else 
 		{
@@ -150,6 +169,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 			currentPlayer = changePlayer(currentPlayer);
 		}
 	}
+	//currentPlayer has to get changed back, because it already gets changed after the winning move
 	currentPlayer = changePlayer(currentPlayer);
 	if (currentPlayer == 'X') {
 		printf("\nGood Job! You won against the computer :)");
@@ -185,16 +205,13 @@ void populateTree(treeNode* root, char currentState[6][7])
 	for (int i = 0; i < 7; i++)
 	{
 		copyGrid(currentState, fakeGrid); //set the fake grid to its original form
-		placeMockInput(fakeGrid, i, 'O');
-
+		
 		for (int j = 0; j < 7; j++)
 		{
-			placeMockInput(fakeGrid, i, 'X');
 			for (int k = 0; k < 7; k++)
 			{
-				placeMockInput(fakeGrid, i, 'O');
 				count++;
-				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid, i);
+				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid, i, 'x');
 				printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
 			}
 		}
@@ -219,25 +236,36 @@ int minMax(treeNode* root)
 
 }
 
-int evaluateGrid(char grid[6][7], int columnToPlace)
+//opimizations:
+//	- don't always count all 4 entries for every possibility
+//	- maybe reduce recurrence after each possibility
+//	- improve evaluationOfFour algorithm
+
+int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 {
 	//determine the row in which the new piece is placed
 	int rowToPlace = -1;
 	for (int i = 5; i >= 0; i--)
 	{
-		if (grid[i][columnToPlace] == ' ') rowToPlace = i;
+		if (grid[i][columnToPlace] == ' ') {
+			rowToPlace = i;
+			break;
+		}
 	}
+	printf("row: %d  value: ", rowToPlace);
 
 	if (rowToPlace == -1) {
 		printf("grid couldn't be evaluated");
 		return -1000;
 	}
+	grid[rowToPlace][columnToPlace] = cP;
 	
 	//starting from the current piece, analyze in all directions the consequences of the move
 	int xCount = 0;
 	int oCount = 0;
 	int emptyCount = 0;
 	int result = 0;
+	int overStepped = 0;
 
 	//vertical
 	for (int i = 0; i < 4; i++)
@@ -247,10 +275,21 @@ int evaluateGrid(char grid[6][7], int columnToPlace)
 			if (grid[rowToPlace + i][columnToPlace] == 'X') xCount++;
 			else if (grid[rowToPlace + i][columnToPlace] == 'O') oCount++;
 		}
+		else {
+			overStepped = 1;
+			break;
+		}
 	}
-	emptyCount = 4 - (xCount + oCount);
-	result += evaluationOfFour(xCount, oCount, emptyCount);
+
+	if (!overStepped) {
+		emptyCount = 4 - (xCount + oCount);
+		result += evaluationOfFour(xCount, oCount, emptyCount);
+	}
+		xCount = 0;
+		oCount = 0;
 	
+	overStepped = 0;
+
 	//horizontal right
 	for (int i = 0; i < 4; i++)
 	{
@@ -259,22 +298,80 @@ int evaluateGrid(char grid[6][7], int columnToPlace)
 			if (grid[rowToPlace][columnToPlace + i] == 'X') xCount++;
 			else if (grid[rowToPlace][columnToPlace + i] == 'O') oCount++;
 		}
+		else {
+			overStepped = 1;
+			break;
+		}
 	}
+	if (!overStepped) {
+		emptyCount = 4 - (xCount + oCount);
+		result += evaluationOfFour(xCount, oCount, emptyCount);
+	}
+		xCount = 0;
+		oCount = 0;
+	
+	overStepped = 0;
 	//horizontal left
 	for (int i = 0; i < 4; i++)
 	{
-		if (columnToPlace + i >= 0)
+		if ((columnToPlace - i) >= 0)
 		{
 			if (grid[rowToPlace][columnToPlace - i] == 'X') xCount++;
 			else if (grid[rowToPlace][columnToPlace - i] == 'O') oCount++;
 		}
+		else {
+			overStepped = 1;
+			break;
+		}
+	}
+	if (!overStepped) {
+		emptyCount = 4 - (xCount + oCount);
+		result += evaluationOfFour(xCount, oCount, emptyCount);
+	}
+		xCount = 0;
+		oCount = 0;
+	overStepped = 0;
+	//diagonally left
+	for (int i = 0; i < 4; i++)
+	{
+		if (columnToPlace - i >= 0 && rowToPlace + i <= 5)
+		{
+			if (grid[rowToPlace + i][columnToPlace - i] == 'X') xCount++;
+			else if (grid[rowToPlace + i][columnToPlace - i] == 'O') oCount++;
+		}
+		else {
+			overStepped = 1;
+			break;
+		}
+	}
+	if (!overStepped) {
+		emptyCount = 4 - (xCount + oCount);
+		result += evaluationOfFour(xCount, oCount, emptyCount);
+	}
+		xCount = 0;
+		oCount = 0;
+	
+	overStepped = 0;
+	//diagonally right
+	for (int i = 0; i < 4; i++)
+	{
+		if (columnToPlace + i <= 6 && rowToPlace + i <= 5)
+		{
+			if (grid[rowToPlace + i][columnToPlace + i] == 'X') xCount++;
+			else if (grid[rowToPlace + i][columnToPlace + i] == 'O') oCount++;
+		}
+		else {
+			overStepped = 1;
+			break;
+		}
+	}
+	if (!overStepped) {
+		emptyCount = 4 - (xCount + oCount);
+		result += evaluationOfFour(xCount, oCount, emptyCount);
 	}
 
-	//diagonally left
-
-	//diagonally right
-
-	return 1;
+	grid[rowToPlace][columnToPlace] = ' ';
+	return result;
 }
 
 int evaluationOfFour(int xCount, int oCount, int emptyCount)
