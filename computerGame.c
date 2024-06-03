@@ -43,7 +43,6 @@ char exampleBoard3[6][7] = {
 void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 {
 	int rounds = 0;
-	int* roundsPtr = &rounds;
 
 	char currentPlayer = 'X';
 	char grid[6][7] = { 0 };
@@ -93,7 +92,6 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 
 	while (!gameIsOver(grid))
 	{
-		rounds++;
 		int inputNumber = 0;
 		printBoard(grid);
 		printMessage(currentPlayer);
@@ -112,17 +110,17 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 
 			if (placeInput(currentPlayer, grid, inputNumber) == 1) { //successful
 				currentPlayer = changePlayer(currentPlayer);
+				rounds++;
 			}
 			else
 			{
-				rounds--;
 				printf("This column is full. Please try again");
 				Sleep(1000);
 			}
 
 			//The board is full
 			if (rounds == 42) {
-				printf("\nDraw! Congratulations to you both :) ");
+				printf("\nDraw! The game is now over :) ");
 				return;
 			}
 
@@ -151,11 +149,9 @@ void makeComputerMove(char grid[6][7], treeNode* root)
 	populateTree(root, grid);
 	int move = minMax(root);
 	placeInput('O', grid, move + 1);
-	//evaluate Best Play
-	//placeInput
 }
 
-
+//fill up the outer nodes (leaves) of the tree
 void populateTree(treeNode* root, char currentState[6][7])
 {
 	char fakeGrid[6][7];
@@ -172,11 +168,10 @@ void populateTree(treeNode* root, char currentState[6][7])
 			for (int k = 0; k < 7; k++)
 			{
 				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid,k, 'O');
-				//printf("%d ", root->children[i]->children[j]->children[k]->value);
 			}
 		}
 	}
-	printTree(root);
+	//printTree(root);
 }
 
 //apply minmax algorithm to the populated tree
@@ -197,11 +192,10 @@ int minMax(treeNode* root)
 
 }
 
-//opimizations:
-//	- don't always count all 4 entries for every possibility
-//	- maybe reduce recurrence after each possibility
-//	- improve evaluationOfFour algorithm
-//	- improve the gameOver algorithm so it only counts the current piece
+//TODO - don't always count all 4 entries for every possibility
+//TODO - maybe reduce recurrence after each possibility
+//TODO - improve evaluationOfFour algorithm
+//TODO - improve the gameOver algorithm so it only counts the current piece
 
 int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 {
@@ -391,7 +385,7 @@ int initiateTree(treeNode* root)
 	return 1; //success
 }
 
-//improve this so that it returns a random node if several options are equal
+//TODO - improve this so that it returns a random node if several options are equal
 int maxNode(treeNode* parent)
 {
 	int maxNode = 0;

@@ -2,15 +2,13 @@
 #include "resources.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <io.h>
-#include "humanGame.h"
-#include <ctype.h>
 #include "computerGame.h"
 #include <string.h>
 
+const size_t size = sizeof(char) * 6 * 7;
+
 void copyGrid(char src[6][7], char destination[6][7])
 {
-	size_t size = sizeof(char) * 6 * 7;
 	memcpy(destination, src, size);
 }
 
@@ -113,12 +111,11 @@ int gameIsOver(char grid[6][7])
 }
 
 char changePlayer(char cP) {
-	if (cP == 'X') return 'O';
-	else return 'X';
+	return (cP == 'X') ? 'O' : 'X';
 }
 
 void printMessage(char player) {
-	printf("Player %c, input a number from 1 to 7 to set, -1 to undo or -2 to save>> ", player);
+	printf("Player %c, please input a number from 1 to 7 to set>> ", player);
 }
 
 void printHorizontalLine()
