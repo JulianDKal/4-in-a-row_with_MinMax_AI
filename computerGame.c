@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <Windows.h>
 
 #define MAX_DEPTH 3
 char emptyBoard[6][7] = {
@@ -41,8 +42,6 @@ char exampleBoard3[6][7] = {
 
 void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 {
-	int backupped = 0;
-	int* backuppedPtr = &backupped;
 	int rounds = 0;
 	int* roundsPtr = &rounds;
 
@@ -113,7 +112,6 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 
 			if (placeInput(currentPlayer, grid, inputNumber) == 1) { //successful
 				currentPlayer = changePlayer(currentPlayer);
-				backupped = 0; //reset the backup checker
 			}
 			else
 			{
@@ -150,39 +148,35 @@ void makeComputerMove(char grid[6][7], treeNode* root)
 {
 	Sleep(500);
 	char currentPlayer = 'O';
-	srand((unsigned int)time(NULL));
-	while (1)
-	{
-		int randomNumber = rand() % 7 + 1;
-		if (placeInput(currentPlayer, grid, randomNumber) != 0){
-			break;
-		}
-	}
 	populateTree(root, grid);
+	int move = minMax(root);
+	placeInput('O', grid, move + 1);
 	//evaluate Best Play
 	//placeInput
 }
+
 
 void populateTree(treeNode* root, char currentState[6][7])
 {
 	char fakeGrid[6][7];
 	copyGrid(currentState, fakeGrid);
-	int count = 0;
 
 	for (int i = 0; i < 7; i++)
 	{
 		copyGrid(currentState, fakeGrid); //set the fake grid to its original form
+		placeInput('O', fakeGrid, i);
 		
 		for (int j = 0; j < 7; j++)
 		{
+			placeInput('X', fakeGrid, j);
 			for (int k = 0; k < 7; k++)
 			{
-				count++;
-				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid, i, 'x');
-				//printf("%d ", /*root->children[i]->children[j]->children[k]->value*/count);
+				root->children[i]->children[j]->children[k]->value = evaluateGrid(fakeGrid,k, 'O');
+				//printf("%d ", root->children[i]->children[j]->children[k]->value);
 			}
 		}
 	}
+	printTree(root);
 }
 
 //apply minmax algorithm to the populated tree
@@ -207,6 +201,7 @@ int minMax(treeNode* root)
 //	- don't always count all 4 entries for every possibility
 //	- maybe reduce recurrence after each possibility
 //	- improve evaluationOfFour algorithm
+//	- improve the gameOver algorithm so it only counts the current piece
 
 int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 {
@@ -219,7 +214,6 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 			break;
 		}
 	}
-	//printf("row: %d  value: ", rowToPlace);
 
 	if (rowToPlace == -1) {
 		printf("grid couldn't be evaluated");
@@ -351,24 +345,10 @@ int evaluationOfFour(int xCount, int oCount, int emptyCount)
 	else if (oCount == 3 && emptyCount == 1) result += 5;
 	else if (oCount == 2 && emptyCount == 2) result += 3;
 	else if (oCount == 2 && emptyCount <= 1) result += 1;
-	else if (oCount == 1 && xCount >= 2) result += 5;
+	else if (oCount == 1 && xCount >= 2) result += 7;
 
 	return result;
 }
-
-//if possible, places an input on the copy of the current grid
-//int placeMockInput(char grid[6][7], int column, char currentPlayer)
-//{
-//	for (int i = 5; i >= 0; i--)
-//	{
-//		if (grid[i][column] != ' ') continue;
-//		else {
-//			grid[i][column] = currentPlayer;
-//			return 1; //success
-//		}
-//	}
-//	return 0; //failure, can't place sign
-//}
 
 //creates a tree with a total of 399 nodes, only called once
 int initiateTree(treeNode* root)
@@ -438,4 +418,20 @@ int minNode(treeNode* parent)
 		}
 	}
 	return minNode;
+}
+
+void printTree(treeNode* root)
+{
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			printf("Nodes of %d | %d\n", i, j);
+			for (int k = 0; k < 7; k++)
+			{
+				printf("%d ", root->children[i]->children[j]->children[k]->value);
+			}
+			printf("\n");
+		}
+	}
 }
