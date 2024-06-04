@@ -5,11 +5,11 @@
 #include "computerGame.h"
 #include <string.h>
 
-const size_t size = sizeof(char) * 6 * 7;
+const size_t gridSizeGlobal = sizeof(char) * 6 * 7;
 
 void copyGrid(char src[6][7], char destination[6][7])
 {
-	memcpy(destination, src, size);
+	memcpy(destination, src, gridSizeGlobal);
 }
 
 void printBoard(char grid[6][7])
