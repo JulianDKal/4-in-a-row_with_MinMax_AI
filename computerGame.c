@@ -135,20 +135,26 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 	//currentPlayer has to get changed back, because it already gets changed after the winning move
 	currentPlayer = changePlayer(currentPlayer);
 	if (currentPlayer == 'X') {
+		printBoard(grid);
 		printf("\nGood Job! You won against the computer :)");
 	}
 	else {
+		printBoard(grid);
 		printf("\nOh no, the computer won :(");
 	}
 }
 
 void makeComputerMove(char grid[6][7], treeNode* root)
 {
-	Sleep(500);
+	//Sleep(500);
 	char currentPlayer = 'O';
 	populateTree(root, grid);
 	int move = minMax(root);
-	placeInput('O', grid, move + 1);
+	if (!placeInput('O', grid, move + 1)) {
+		system("cls");
+		printf("Oh no, the AI made an impossible move!");
+		printTree(root);
+	}
 }
 
 //fill up the outer nodes (leaves) of the tree
@@ -189,7 +195,6 @@ int minMax(treeNode* root)
 		}
 		else return minNode(root); //human move, minimizing
 	}
-
 }
 
 //TODO - don't always count all 4 entries for every possibility
@@ -210,7 +215,6 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 	}
 
 	if (rowToPlace == -1) {
-		printf("grid couldn't be evaluated");
 		return -1000;
 	}
 	grid[rowToPlace][columnToPlace] = cP;
@@ -240,10 +244,7 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 		emptyCount = 4 - (xCount + oCount);
 		result += evaluationOfFour(xCount, oCount, emptyCount);
 	}
-		xCount = 0;
-		oCount = 0;
-	
-	overStepped = 0;
+	xCount = 0; oCount = 0; overStepped = 0;
 
 	//horizontal right
 	for (int i = 0; i < 4; i++)
@@ -262,10 +263,8 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 		emptyCount = 4 - (xCount + oCount);
 		result += evaluationOfFour(xCount, oCount, emptyCount);
 	}
-		xCount = 0;
-		oCount = 0;
-	
-	overStepped = 0;
+	xCount = 0; oCount = 0;	overStepped = 0;
+
 	//horizontal left
 	for (int i = 0; i < 4; i++)
 	{
@@ -283,9 +282,8 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 		emptyCount = 4 - (xCount + oCount);
 		result += evaluationOfFour(xCount, oCount, emptyCount);
 	}
-		xCount = 0;
-		oCount = 0;
-	overStepped = 0;
+	xCount = 0;	oCount = 0; overStepped = 0;
+
 	//diagonally left
 	for (int i = 0; i < 4; i++)
 	{
@@ -303,10 +301,8 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 		emptyCount = 4 - (xCount + oCount);
 		result += evaluationOfFour(xCount, oCount, emptyCount);
 	}
-		xCount = 0;
-		oCount = 0;
-	
-	overStepped = 0;
+	xCount = 0;	oCount = 0; overStepped = 0;
+
 	//diagonally right
 	for (int i = 0; i < 4; i++)
 	{
@@ -331,17 +327,14 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char cP)
 
 int evaluationOfFour(int xCount, int oCount, int emptyCount)
 {
-	int result = 0;
 	if (oCount == 4) {
-		result = 500;
-		return result;
+		return 500;
 	}
-	else if (oCount == 3 && emptyCount == 1) result += 5;
-	else if (oCount == 2 && emptyCount == 2) result += 3;
-	else if (oCount == 2 && emptyCount <= 1) result += 1;
-	else if (oCount == 1 && xCount >= 2) result += 7;
-
-	return result;
+	else if (oCount == 3 && emptyCount == 1) return 5;
+	else if (oCount == 2 && emptyCount == 2) return 3;
+	else if (oCount == 2 && emptyCount <= 1) return 1;
+	else if (oCount == 1 && xCount == 2 && emptyCount == 1) return 6;
+	else if (oCount == 1 && xCount == 3) return 8;
 }
 
 //creates a tree with a total of 399 nodes, only called once
