@@ -2,7 +2,6 @@
 #include "resources.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "computerGame.h"
 #include <string.h>
 
 const size_t gridSizeGlobal = sizeof(char) * 6 * 7;
@@ -14,7 +13,13 @@ void copyGrid(char src[6][7], char destination[6][7])
 
 void printBoard(char grid[6][7])
 {
+#ifdef _WIN32
 	system("cls");
+#elif __linux__
+	system("clear");
+#else printf("OS unsupported");
+	#endif"
+
 	for (int i = 0; i < 7; i++)
 	{
 		printf("   %d  ", i + 1);

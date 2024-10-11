@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Windows.h>
+#include <unistd.h>
+//#include <Windows.h>
 
 #define MAX_DEPTH 3
 
@@ -48,7 +49,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 		#pragma region Human Move Code
 			while (1)
 			{
-				if (scanf_s("%d", &inputNumber) == 1 && (inputNumber >= 1 && inputNumber <= 7)) break;
+				if (scanf("%d", &inputNumber) == 1 && (inputNumber >= 1 && inputNumber <= 7)) break;
 				while (fgetc(stdin) != '\n')
 					;
 
@@ -63,7 +64,7 @@ void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 			else
 			{
 				printf("This column is full. Please try again");
-				Sleep(1000);
+				sleep(1000);
 			}
 
 			//The board is full

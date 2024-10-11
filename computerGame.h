@@ -16,3 +16,4 @@ int evaluateGrid(char grid[6][7], int columnToPlace, char currentPlayer);
 int maxNode(treeNode* parent);
 int minNode(treeNode* parent);
 void printTree(treeNode* root);
+int evaluationOfFour(int xCount, int oCount, int emptyCount);

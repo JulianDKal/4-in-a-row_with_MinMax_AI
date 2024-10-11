@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "computerGame.h"
-#include "resources.h"
 
 int main()
 {
