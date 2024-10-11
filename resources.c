@@ -106,7 +106,6 @@ int gameIsOver(char grid[6][7])
 		}
 	}
 
-
 	return 0;
 }
 

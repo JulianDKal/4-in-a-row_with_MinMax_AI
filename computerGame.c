@@ -6,64 +6,12 @@
 #include <Windows.h>
 
 #define MAX_DEPTH 3
-char emptyBoard[6][7] = {
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '}
-};
-char exampleBoard1[6][7] = {
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', 'X', 'X', ' ', ' ', ' '},
-	{' ', 'X', 'X', 'O', 'O', 'O', ' '}
-};
-char exampleBoard2[6][7] = {
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', 'O', ' ', ' '},
-	{' ', ' ', ' ', 'X', 'O', ' ', ' '},
-	{' ', 'O', 'O', 'X', 'X', ' ', ' '},
-	{' ', 'X', 'X', 'O', 'O', 'O', 'X'}
-};
-char exampleBoard3[6][7] = {
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
-	{'X', 'O', ' ', ' ', ' ', ' ', ' '},
-	{'O', 'X', ' ', ' ', ' ', ' ', ' '},
-	{'X', 'O', 'X', 'O', 'X', ' ', ' '}
-};
-
 
 void startComputerGame(char loadGrid[6][7], int loaded, char cP)
 {
 	int rounds = 0;
-
 	char currentPlayer = 'X';
 	char grid[6][7] = { 0 };
-
-	for (int i = 0; i < 7; i++)
-	{
-		printf("%d ", evaluateGrid(exampleBoard1, i, 'O'));
-		printf("\n");
-	}
-	printf("\n");
-	for (int i = 0; i < 7; i++)
-	{
-		printf("%d ", evaluateGrid(exampleBoard2, i, 'O'));
-		printf("\n");
-	}
-	printf("\n");
-	for (int i = 0; i < 7; i++)
-	{
-		printf("%d ", evaluateGrid(exampleBoard3, i, 'O'));
-		printf("\n");
-	}
 
 	//fill up the grids
 	for (int i = 0; i < 6; i++)
