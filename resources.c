@@ -18,7 +18,7 @@ void printBoard(char grid[6][7])
 #elif __linux__
 	system("clear");
 #else printf("OS unsupported");
-	#endif"
+	#endif
 
 	for (int i = 0; i < 7; i++)
 	{
